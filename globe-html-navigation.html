@@ -57,21 +57,31 @@
         // Example points
         let dotOnBorder = 0.005;
         let cityPointSize = 0.01;
-        addPoint(37.7749, -122.4194, cityPointSize, { color: 0xff0000 }); // San Francisco
-        addPoint(40.7128, -74.0060, cityPointSize, { color: 0xff0000 });  // New York
-        addPoint(15.2993, 74.1240, cityPointSize, { color: 0x0000ff }); //goa
-        addPoint(28.7041, 77.1025, cityPointSize, { color: 0x0000ff }); //delhi
-        addPoint(22.5726, 88.3639, cityPointSize, { color: 0x0000ff }); //kolkata
-        addPoint(17.4065, 78.4772, cityPointSize, { color: 0x0000ff }); //hyderabad
-        addPoint(13.0827, 80.2707, cityPointSize, { color: 0x0000ff }); //chennai
-        addPoint(34.0837, 74.7973, cityPointSize, { color: 0x0000ff }); //srinagar
-        addPoint(23.0225, 72.5714, cityPointSize, { color: 0x0000ff }); //ahmedabad
-        addPoint(26.1433, 91.7898, cityPointSize, { color: 0x0000ff }); //dispur
-        //Indian Beaches
-        addPoint(8.19747, 77.22431, dotOnBorder, { color: 0x000000 }); //paraikal beach
-        addPoint(8.126215, 77.319641, dotOnBorder, { color: 0x000000 }); //muttom beach
-        addPoint(8.12678, 77.35066, dotOnBorder, { color: 0x000000 }); //lemur beach
-        addPoint(8.11030, 77.39718, dotOnBorder, { color: 0x000000 }); //Pozhikarai beach park
+        let citiesToPlot = [
+            [37.7749, -122.4194],// San Francisco
+            [40.7128, -74.0060],// New York
+            [15.2993, 74.1240],//goa
+            [28.7041, 77.1025],//delhi
+            [22.5726, 88.3639],//kolkata
+            [17.4065, 78.4772],//hyderabad
+            [13.0827, 80.2707],//chennai
+            [34.0837, 74.7973],//srinagar
+            [23.0225, 72.5714],//ahmedabad
+            [26.1433, 91.7898], //dispur
+        ];
+        citiesToPlot.forEach((coords)=>{
+            addPoint(coords[0],coords[1],cityPointSize, { color: 0x0000ff });
+        });
+        //Boundaries or Beaches
+        let beachesOrBorderToPlot = [
+            [8.19747, 77.22431],//paraikal beach
+            [8.126215, 77.319641],//muttom beach
+            [8.12678, 77.35066],//lemur beach
+            [8.11030, 77.39718],//Pozhikarai beach park
+        ];
+        beachesOrBorderToPlot.forEach((coords)=>{
+            addPoint(coords[0],coords[1],dotOnBorder, { color: 0x000000 });
+        });
         //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
         setInterval(function() {
             navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
