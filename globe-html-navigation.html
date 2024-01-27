@@ -26,7 +26,7 @@
         const textureLoader = new THREE.TextureLoader();
         const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
         //const material = new THREE.MeshBasicMaterial({ map: texture });
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const material = new THREE.MeshBasicMaterial({ color: 0xaaaf00 });
         const earth = new THREE.Mesh(geometry, material);
         scene.add(earth);
 
@@ -78,6 +78,62 @@
             [8.126215, 77.319641],//muttom beach
             [8.12678, 77.35066],//lemur beach
             [8.11030, 77.39718],//Pozhikarai beach park
+            [8.08990, 77.48301],//manakudi beach
+            [8.07937, 77.53176],//sunset point kanyakumari
+            [8.08820, 77.55562],//kanyakumari beach
+            [8.13885, 77.57572],//Rasthakadu Beach
+            [8.15533, 77.62034],//Chettikulam Beach
+            [8.16264, 77.66034],//Panjal Beach
+            [8.16366, 77.68094],//Koodan Kulam Beach
+            [8.21820, 77.78101],//St Quiteria Shrine KuthenKuly
+            [8.26237, 77.84402],//Sri Moogambigai Siddha Vaithiya Salai, Semponvilai
+            [8.28174, 77.89431],//Uvari Beach
+            [8.30178, 77.92675],//Kooduthalai
+            [8.32641, 77.96040],//Thopuvilai Beach
+            [8.37735, 78.05913],//Manapad Fish Market
+            [8.39702, 78.05867],//Kulashekarapatanam Beach
+            [8.44622, 78.08396],//Kallamozhi Beach
+            [8.48717, 78.12188],//Tiruchendur Beach
+            [8.49633, 78.12941],//Thiruchendur Murugan Temple
+            [8.56201, 78.13240],//Kayalpatnam Beach
+            [8.57189, 78.13428],//Singithurai Beach
+            [8.58232, 78.13657],//Kombuthurai Beach
+            [8.63886, 78.12746],//Punnakayal Beach
+            [8.69351, 78.13666],//Sri Mottayasamy Sri Kayakari
+            [8.72781, 78.15751],//Mullakkadu Beach
+            [8.78893, 78.19402],//Hare island Beach
+            [8.80816, 78.16262],//Muthu Nagar New Beach
+            [8.81575, 78.16316],//Therespuram Fishery
+            [8.83473, 78.16519],//Thlamuthunagar Beach
+            [8.85819, 78.16649],//Athisaya Kadal Matha Church
+            [8.88891, 78.17389],//Tharuvaikulam fishing harbour
+            [8.92081, 78.18450],//Pattanamarudur Beach view point
+            [8.95482, 78.20653],//Aqua Outback Resort and Watersports Academy
+            [8.96661, 78.21544],//Panaiyur Beach
+            [8.99277, 78.24914],//Sippikulam Beach
+            [8.99785, 78.25662],//Keelavaipar Beach
+            [9.01719, 78.28721],//Kalaignanapuram Beach
+            [9.06038, 78.34563],//Sea Palm Inn
+            [9.07665, 78.36512],//Vembar Beach
+            [9.08857, 78.37771],//Suganya Beach
+            [9.10218, 78.39679],//Beach Point
+            [9.10986, 78.40821],//Velayuthapuram beautiful beach
+            [9.12123, 78.43888],//Sea land Resort
+            [9.12806, 78.47865],//AW SEA FOOD
+            [9.13826, 78.53359],//Mariyur Fishing Market
+            [9.13869, 78.58581],//Keelamunthal fish market , keelamunthal
+            [9.15526, 78.62958],//Valinokkam Beach
+            [9.20212, 78.71979],//Ervadi Beach
+            [9.24256, 78.82245],//Pakkirapa Sea Park
+            [9.27712, 78.96933],//Valangapuri beach
+            [9.29413, 79.26411],//Ocean paradise Beach Resort & Sea Food Restaurant
+            [9.37093, 78.97415],//Alagankulam Beach
+            [9.43721, 78.91912],//Mudiveeran Beach
+            [9.49811, 78.90969],//Saltpan
+            [9.54455, 78.91806],//Beach Mosque
+            [9.55205, 78.91986],//Kaliyamman Kovil
+            [9.57556, 78.92559],//Uppur 
+            [9.58737, 78.92700],//L&T bridge
         ];
         beachesOrBorderToPlot.forEach((coords)=>{
             addPoint(coords[0],coords[1],dotOnBorder, { color: 0x000000 });
