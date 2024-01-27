@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Earth with Coordinates</title>
+    <script src="https://threejs.org/build/three.js"></script>
+</head>
+<body>
+    <script>
+        // Set up the scene
+        const scene = new THREE.Scene();
+
+        // Set up the camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        // Set up the renderer
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a sphere (Earth)
+        let radius = 3;
+        const geometry = new THREE.SphereGeometry(radius, 32, 32);
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
+        //const material = new THREE.MeshBasicMaterial({ map: texture });
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const earth = new THREE.Mesh(geometry, material);
+        scene.add(earth);
+
+        // Create a wireframe mesh
+        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+        earth.add(wireframe);
+
+        // Function to add a point based on latitude and longitude
+        function addPoint(latitude, longitude, cityPointSize, color) {
+            const phi = (90 - latitude) * Math.PI / 180;
+            const theta = (180 - longitude) * Math.PI / 180;
+
+            const x = radius * Math.sin(phi) * Math.cos(theta);
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+
+            const pointGeometry = new THREE.SphereGeometry(cityPointSize);
+            const pointMaterial = new THREE.MeshBasicMaterial(color);
+            const point = new THREE.Mesh(pointGeometry, pointMaterial);
+            point.position.set(x, y, z);
+
+            // Add the point as a child of the Earth mesh
+            earth.add(point);
+        }
+
+        // Example points
+        let dotOnBorder = 0.005;
+        let cityPointSize = 0.01;
+        addPoint(37.7749, -122.4194, cityPointSize, { color: 0xff0000 }); // San Francisco
+        addPoint(40.7128, -74.0060, cityPointSize, { color: 0xff0000 });  // New York
+        addPoint(15.2993, 74.1240, cityPointSize, { color: 0x0000ff }); //goa
+        addPoint(28.7041, 77.1025, cityPointSize, { color: 0x0000ff }); //delhi
+        addPoint(22.5726, 88.3639, cityPointSize, { color: 0x0000ff }); //kolkata
+        addPoint(17.4065, 78.4772, cityPointSize, { color: 0x0000ff }); //hyderabad
+        addPoint(13.0827, 80.2707, cityPointSize, { color: 0x0000ff }); //chennai
+        addPoint(34.0837, 74.7973, cityPointSize, { color: 0x0000ff }); //srinagar
+        addPoint(23.0225, 72.5714, cityPointSize, { color: 0x0000ff }); //ahmedabad
+        addPoint(26.1433, 91.7898, cityPointSize, { color: 0x0000ff }); //dispur
+        //Indian Beaches
+        addPoint(8.19747, 77.22431, dotOnBorder, { color: 0x000000 }); //paraikal beach
+        addPoint(8.126215, 77.319641, dotOnBorder, { color: 0x000000 }); //muttom beach
+        addPoint(8.12678, 77.35066, dotOnBorder, { color: 0x000000 }); //lemur beach
+        addPoint(8.11030, 77.39718, dotOnBorder, { color: 0x000000 }); //Pozhikarai beach park
+        //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+        setInterval(function() {
+            navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+        }, 1000);
+
+        function geoSuccess(pos) {
+          const crd = pos.coords;
+          addPoint(crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+        }
+
+        function geoError(error) {
+            console.log(error);
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the Earth
+            earth.rotation.y += 0.007;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
