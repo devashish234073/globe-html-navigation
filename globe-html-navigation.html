@@ -134,6 +134,78 @@
             [9.55205, 78.91986],//Kaliyamman Kovil
             [9.57556, 78.92559],//Uppur 
             [9.58737, 78.92700],//L&T bridge
+            [9.60912, 78.93495],//Morepannai Beach
+            [9.62303, 78.95202],//Chitturuvadi
+            [9.629795, 78.958817],//Chitturuvadi
+            [9.632512, 78.959907],//Chitturuvadi
+            [9.635290, 78.960634],//Chitturuvadi
+            [9.64663, 78.96572],//Karankadu Beach
+            [9.65638, 78.97028],//Mulli munai Beach
+            [9.666212, 78.971083],//A Manakudi
+            [9.674112, 78.974244],//Pudupattinam
+            [9.68165, 78.97704],//K.K Pattinam Beach
+            [9.69069, 78.98048],//veera sangili madam beach
+            [9.698194, 78.988502],//Pudupattinam
+            [9.70880, 78.99356],//Bharath petrolium(TNFDC) M.V.PATTINAM
+            [9.71307, 78.99739],//Singaravelar Dry Fish
+            [9.72240, 79.00588],//Bala Murugan Temple
+            [9.73511, 79.01703],//Arulmigu Adheeswarar Temple
+            [9.74343, 79.02187],//Thondi beach
+            [9.754841, 79.031548],//Muthuramlingappa
+            [9.76320, 79.03740],//M.R. Pattinam
+            [9.76748, 79.04389],//Fish Market Pariyavalasaipattinam
+            [9.77421, 79.05771],//Odavayal beach
+            [9.79097, 79.06740],//Sri VInayakar Temple
+            [9.799980, 79.078367],//Tiruvadanai
+            [9.81084, 79.08018],//Masjid Taqwa Tntj Markaz Pasipattinam
+            [9.82081, 79.08587],//Cricket Ground Theerthandathanam
+            [9.835676, 79.102684],//Mangrove Forest Marungur
+            [9.850878, 79.117527],//Mangrove Forest Marungur
+            [9.860016, 79.123069],//Mangrove Forest Marungur
+            [9.86947, 79.11832],//Muthukkuda beach
+            [9.89211, 79.12587],//Arasanagaripattinam Beach
+            [9.919282, 79.152376],//Nattanipurasakudi
+            [9.940912, 79.165171],//Nattanipurasakudi
+            [9.952498, 79.175296],//Nattanipurasakudi
+            [9.97340, 79.19759],//GH Hospital
+            [9.99220, 79.21088],//Sri Sakthi Vinayakar Temple Pudukkudi
+            [10.02454, 79.24033],//Panimaya Matha Church
+            [10.03920, 79.26605],//Kodiyakkarai beach
+            [10.05339, 79.24617],//Kottu Puli Appa Dargah
+            [10.07428, 79.23415],//SMK Bismi Aqua Farms
+            [10.100117, 79.225849],//Krishnajipattinam Post Office
+            [10.115360, 79.229086],//Enadi Tamil Nadu
+            [10.123481, 79.231738],//Enadi Tamil Nadu
+            [10.128163, 79.236882],//Alanganvayal TN
+            [10.13358, 79.22960],//Kattumavadi beach view
+            [10.150885, 79.232709],//Kuppathevan Tamil Nadu
+            [10.158049, 79.240311],//Tiruvathevan Tamil Nadu
+            [10.17405, 79.24065],//Kattan duraimugam mandiripattinam
+            [10.18668, 79.24785],//Senthalai Beach
+            [10.19444, 79.26045],//Palm Beach
+            [10.212186, 79.278923],//Villunivayal Tamil Nadu
+            [10.221419, 79.278098],//Peravurani
+            [10.232753, 79.268247],//Vaithiswaran
+            [10.25004, 79.28376],//Sethubavachataram Beach
+            [10.26594, 79.30411],//Manora BEach
+            [10.27328, 79.31393],//K. R Colony beach Road
+            [10.277333, 79.318698],//Mallipattinam Fish Harbour
+            [10.28426, 79.33023],//PERAVURANI , PUDUPATTINAM DELTA BEACH
+            [10.287223, 79.342048],//PUDUPATTINAM DELTA BEACH Ending
+            [10.287272, 79.347990],//Pudupattinam
+            [10.293585, 79.367526],//Agniyar River
+            [10.31727, 79.38642],//Adirai Beach
+            [10.31253, 79.52254],//Muthupet lagoon mouth
+            [10.294744, 79.874395],//Vedranyam
+            [10.550440, 79.856003],//Kovilpathu TamilNadu
+            [10.809009, 79.849074],//Nagapattinam Tamil Nadu
+            [10.91715, 79.85573],//Karaikal Beach Sea Water View Point
+            [10.977730, 79.853375],//Kalikuppam
+            [11.000835, 79.853785],//Chandirappadi
+            [11.032475, 79.855218],//Tharangambadi
+            [11.05955, 79.85543],//Perumal pettai seashore
+            [11.07518, 79.85723],//veppancheri beach
+            [11.09131, 79.85649],//chinnangudi beach
         ];
         beachesOrBorderToPlot.forEach((coords)=>{
             addPoint(coords[0],coords[1],dotOnBorder, { color: 0x000000 });
@@ -157,7 +229,7 @@
             requestAnimationFrame(animate);
 
             // Rotate the Earth
-            earth.rotation.y += 0.007;
+            earth.rotation.y += 0.005;
 
             renderer.render(scene, camera);
         }
