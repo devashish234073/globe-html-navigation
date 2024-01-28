@@ -23,8 +23,8 @@
         // Create a sphere (Earth)
         let radius = 3;
         const geometry = new THREE.SphereGeometry(radius, 32, 32);
-        const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
+        //const textureLoader = new THREE.TextureLoader();
+        //const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
         //const material = new THREE.MeshBasicMaterial({ map: texture });
         const material = new THREE.MeshBasicMaterial({ color: 0xaaaf00 });
         const earth = new THREE.Mesh(geometry, material);
@@ -208,7 +208,7 @@
             [11.09131, 79.85649],//chinnangudi beach
         ];
         beachesOrBorderToPlot.forEach((coords)=>{
-            addPoint(coords[0],coords[1],dotOnBorder, { color: 0x000000 });
+            addPoint(coords[0],coords[1],dotOnBorder, { color: 0x00ffff });
         });
         //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
         setInterval(function() {
