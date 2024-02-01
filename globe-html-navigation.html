@@ -4,10 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Earth with Coordinates</title>
-    <script src="https://threejs.org/build/three.js"></script>
+    <!-- <script src="https://threejs.org/build/three.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" integrity="sha512-vnmn/Qqn6aG0POAc9mIGzjq0IybrvxJXYDafNvp9JSnDGxeF3pbkSqLvf+YGd5ku63pT7sa/jxHn7/d0mU8+tA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        #paramsTable {
+            font-size:12px;
+            color:red;
+        }
+        #longitude, #latitude {
+            
+        }
+    </style>
 </head>
 <body>
+    <table id="paramsTable">
+        <tr>
+            <td>Latitude</td><td><input type="text" id="latitude"></td><td>Longitude</td><td><input type="text" id="longitude"></td><td><button onclick="fire()">Fire</button></td><td>Time</td><td id="time"></td>
+        </tr>
+    </table>
     <script>
+        function $(selector) {
+            return document.querySelector(selector);
+        }
+        function fire() {
+
+        }
         // Set up the scene
         const scene = new THREE.Scene();
 
@@ -324,12 +345,16 @@
         }
 
         // Animation loop
+        let t0 = new Date();
+        let time = new Date();
+        let g = 9.8;
         function animate() {
             requestAnimationFrame(animate);
 
             // Rotate the Earth
             earth.rotation.y += 0.005;
-
+            time = new Date();
+            $("#time").innerText = ((time.getTime()-t0.getTime())/1000.0)+" sec";
             renderer.render(scene, camera);
         }
 
