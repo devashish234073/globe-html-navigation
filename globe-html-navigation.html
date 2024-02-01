@@ -8,17 +8,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" integrity="sha512-vnmn/Qqn6aG0POAc9mIGzjq0IybrvxJXYDafNvp9JSnDGxeF3pbkSqLvf+YGd5ku63pT7sa/jxHn7/d0mU8+tA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         #paramsTable {
+            margin-left:10px;
+            margin-top:10px;
+            padding:5px;
+            background-color: rgba(0,0,0,0.5);
+            position: fixed;
             font-size:12px;
-            color:red;
+            color:yellow;
+            border:1px solid lightgreen;
+            border-radius: 10px;
         }
         #longitude, #latitude {
             
         }
         #paramsTable input[type='number'] {
+            background-color: rgba(0,0,0,0.5);
+            color:lightgreen;
             width: 80px;
         }
-        #paramsTable button:active {
+        #paramsTable button {
+            height:26px;
+            font-size:15px;
             color:white;
+            background-color: rgba(0,0,0,0.5);
+        }
+        #paramsTable button:active {
             background-color: blue;
         }
     </style>
@@ -26,7 +40,22 @@
 <body>
     <table id="paramsTable">
         <tr>
-            <td>Latitude</td><td><input type="number" id="latitude"></td><td>Longitude</td><td><input type="number" id="longitude"></td><td><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button><input type="range" value="1" min="1" max="10" id="gscale"><span id="gscaleTxt"></span><button onclick="fireZWithGravity()">FireZ With Gravity</button></td><td>Time</td><td id="time"></td>
+            <td>Time</td><td id="time"></td>
+        </tr>
+        <tr>
+            <td>Latitude</td><td><input type="number" id="latitude"></td>
+        </tr>
+        <tr>
+            <td>Longitude</td><td><input type="number" id="longitude"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button></td>
+        </tr>
+        <tr>
+            <td><input type="range" value="1" min="0.05" max="10" step="0.05" id="gscale"></td><td><span id="gscaleTxt"></span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button onclick="fireZWithGravity()">FireZ With Gravity</button></td>
         </tr>
     </table>
     <script>
@@ -41,7 +70,7 @@
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
             } else {
-                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xffaaff });
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xffaaff });
                 pointsToFireX.push(point);
             }
         }
@@ -49,7 +78,7 @@
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
             } else {
-                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xff22ff });
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xff22ff });
                 pointsToFireY.push(point);
             }
         }
@@ -57,7 +86,7 @@
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
             } else {
-                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xfaee0f });
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 pointsToFireZ.push(point);
             }
         }
@@ -65,7 +94,7 @@
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
             } else {
-                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xfaee0f });
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 let t0 = new Date();
                 pointsToFireZWithGravity.push([point,point.position.z,t0.getTime()]);
             }
@@ -93,13 +122,13 @@
         //const textureLoader = new THREE.TextureLoader();
         //const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
         //const material = new THREE.MeshBasicMaterial({ map: texture });
-        const material = new THREE.MeshBasicMaterial({ color: 0xaaaf00 });
+        const material = new THREE.MeshBasicMaterial({ color: 0xaaafa6 });
         const earth = new THREE.Mesh(geometry, material);
         scene.add(earth);
 
         // Create a wireframe mesh
         const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x888d84, linewidth: 2 });
         const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
         earth.add(wireframe);
 
