@@ -14,20 +14,51 @@
         #longitude, #latitude {
             
         }
+        #paramsTable input[type='number'] {
+            width: 80px;
+        }
+        #paramsTable button:active {
+            color:white;
+            background-color: blue;
+        }
     </style>
 </head>
 <body>
     <table id="paramsTable">
         <tr>
-            <td>Latitude</td><td><input type="text" id="latitude"></td><td>Longitude</td><td><input type="text" id="longitude"></td><td><button onclick="fire()">Fire</button></td><td>Time</td><td id="time"></td>
+            <td>Latitude</td><td><input type="number" id="latitude"></td><td>Longitude</td><td><input type="number" id="longitude"></td><td><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button></td><td>Time</td><td id="time"></td>
         </tr>
     </table>
     <script>
         function $(selector) {
             return document.querySelector(selector);
         }
-        function fire() {
-
+        let pointsToFireX = [];
+        let pointsToFireY = [];
+        let pointsToFireZ = [];
+        function fireX() {
+            if($("#latitude").value=="" || $("#longitude").value=="") {
+                alert("Please enter latitude and longitude values");
+            } else {
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xffaaff });
+                pointsToFireX.push(point);
+            }
+        }
+        function fireY() {
+            if($("#latitude").value=="" || $("#longitude").value=="") {
+                alert("Please enter latitude and longitude values");
+            } else {
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xff22ff });
+                pointsToFireY.push(point);
+            }
+        }
+        function fireZ() {
+            if($("#latitude").value=="" || $("#longitude").value=="") {
+                alert("Please enter latitude and longitude values");
+            } else {
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xfaee0f });
+                pointsToFireZ.push(point);
+            }
         }
         // Set up the scene
         const scene = new THREE.Scene();
@@ -73,6 +104,7 @@
 
             // Add the point as a child of the Earth mesh
             earth.add(point);
+            return point;
         }
 
         // Example points
@@ -335,9 +367,15 @@
             navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
         }, 1000);
 
+        let firstTimeCoordinatesSet = false;
         function geoSuccess(pos) {
           const crd = pos.coords;
           addPoint(crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+          if(!firstTimeCoordinatesSet) {//This runs only once
+            $("#latitude").value = crd.latitude;
+            $("#longitude").value = crd.longitude;
+            firstTimeCoordinatesSet = true;
+          }
         }
 
         function geoError(error) {
@@ -353,6 +391,15 @@
 
             // Rotate the Earth
             earth.rotation.y += 0.005;
+            pointsToFireX.forEach(point=>{
+                point.position.x += 0.01;
+            });
+            pointsToFireY.forEach(point=>{
+                point.position.y += 0.01;
+            });
+            pointsToFireZ.forEach(point=>{
+                point.position.z += 0.01;
+            });
             time = new Date();
             $("#time").innerText = ((time.getTime()-t0.getTime())/1000.0)+" sec";
             renderer.render(scene, camera);
