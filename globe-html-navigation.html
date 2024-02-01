@@ -425,7 +425,7 @@
                     let u = 5;
                     let tDiff = time.getTime()-tt0;
                     tDiff = tDiff/10000;//scaled down tDiff by 10000
-                    let displacement = u*tDiff-0.5*g*tDiff*tDiff;
+                    let displacement = u*tDiff-0.5*gScaled*tDiff*tDiff;
                     if(displacement>0) {
                         pointObj[0].position.z = s0 + displacement;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
