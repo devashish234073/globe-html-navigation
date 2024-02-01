@@ -26,7 +26,7 @@
 <body>
     <table id="paramsTable">
         <tr>
-            <td>Latitude</td><td><input type="number" id="latitude"></td><td>Longitude</td><td><input type="number" id="longitude"></td><td><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button></td><td>Time</td><td id="time"></td>
+            <td>Latitude</td><td><input type="number" id="latitude"></td><td>Longitude</td><td><input type="number" id="longitude"></td><td><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button><input type="range" value="1" min="1" max="10" id="gscale"><span id="gscaleTxt"></span><button onclick="fireZWithGravity()">FireZ With Gravity</button></td><td>Time</td><td id="time"></td>
         </tr>
     </table>
     <script>
@@ -36,6 +36,7 @@
         let pointsToFireX = [];
         let pointsToFireY = [];
         let pointsToFireZ = [];
+        let pointsToFireZWithGravity = [];
         function fireX() {
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
@@ -60,6 +61,20 @@
                 pointsToFireZ.push(point);
             }
         }
+        function fireZWithGravity() {
+            if($("#latitude").value=="" || $("#longitude").value=="") {
+                alert("Please enter latitude and longitude values");
+            } else {
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.03, { color: 0xfaee0f });
+                let t0 = new Date();
+                pointsToFireZWithGravity.push([point,point.position.z,t0.getTime()]);
+            }
+        }
+        function displayGScale() {
+            $("#gscaleTxt").innerText = "'g' Scale:"+$("#gscale").value;
+        }
+        displayGScale();
+        $("#gscale").addEventListener("change",displayGScale);
         // Set up the scene
         const scene = new THREE.Scene();
 
@@ -390,7 +405,7 @@
             requestAnimationFrame(animate);
 
             // Rotate the Earth
-            earth.rotation.y += 0.005;
+            earth.rotation.y += 0.002;
             pointsToFireX.forEach(point=>{
                 point.position.x += 0.01;
             });
@@ -401,6 +416,24 @@
                 point.position.z += 0.01;
             });
             time = new Date();
+            pointsToFireZWithGravity.forEach(pointObj=>{
+                let s0 = pointObj[1];
+                let tt0 = pointObj[2];
+                let gScale = parseInt($("#gscale").value);
+                let gScaled = g * gScale;
+                if(pointObj[0].position.z>=s0) {
+                    let u = 5;
+                    let tDiff = time.getTime()-tt0;
+                    tDiff = tDiff/10000;//scaled down tDiff by 10000
+                    let displacement = u*tDiff-0.5*g*tDiff*tDiff;
+                    if(displacement>0) {
+                        pointObj[0].position.z = s0 + displacement;
+                        //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
+                    } else {
+                        pointObj[0].position.z = s0-0.01;//placing it slightly lower to prevent logic from re-running
+                    }
+                }
+            });
             $("#time").innerText = ((time.getTime()-t0.getTime())/1000.0)+" sec";
             renderer.render(scene, camera);
         }
