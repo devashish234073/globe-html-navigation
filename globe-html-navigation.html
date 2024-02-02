@@ -55,7 +55,16 @@
             <td><input type="range" value="1" min="0.05" max="10" step="0.05" id="gscale"></td><td><span id="gscaleTxt"></span></td>
         </tr>
         <tr>
+            <td><input type="range" value="5" min="0.05" max="20" step="0.05" id="initialVelocity"></td><td><span id="initialVelocityTxt"></span></td>
+        </tr>
+        <tr>
             <td colspan="2"><button onclick="fireZWithGravity()">FireZ With Gravity</button></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="checkbox" id="earthRotationEnabled">Stop Earth's Rotation</td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating Points At A Bigger Radius</td>
         </tr>
     </table>
     <script>
@@ -100,10 +109,16 @@
             }
         }
         function displayGScale() {
-            $("#gscaleTxt").innerText = "'g' Scale:"+$("#gscale").value;
+            $("#gscaleTxt").innerText = "'g' Scale: "+$("#gscale").value;
         }
         displayGScale();
         $("#gscale").addEventListener("change",displayGScale);
+
+        function displayInitialVelocityValue() {
+            $("#initialVelocityTxt").innerText = "Initial Velocity: "+$("#initialVelocity").value;
+        }
+        displayInitialVelocityValue();
+        $("#initialVelocity").addEventListener("change",displayInitialVelocityValue);
         // Set up the scene
         const scene = new THREE.Scene();
 
@@ -134,20 +149,27 @@
 
         // Function to add a point based on latitude and longitude
         function addPoint(latitude, longitude, cityPointSize, color) {
+            let point = createPoint(radius, latitude, longitude, cityPointSize, color);
+            earth.add(point);
+            if($("#drawFloatingPointsAtBiggerRadius").checked) {
+                let point2 = createPoint(radius*1.2, latitude, longitude, cityPointSize, color);
+                earth.add(point2);
+            }
+            return point;
+        }
+
+        function createPoint(radiusOfSphere, latitude, longitude, cityPointSize, color) {
             const phi = (90 - latitude) * Math.PI / 180;
             const theta = (180 - longitude) * Math.PI / 180;
 
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.cos(phi);
-            const z = radius * Math.sin(phi) * Math.sin(theta);
+            const x = radiusOfSphere * Math.sin(phi) * Math.cos(theta);
+            const y = radiusOfSphere * Math.cos(phi);
+            const z = radiusOfSphere * Math.sin(phi) * Math.sin(theta);
 
             const pointGeometry = new THREE.SphereGeometry(cityPointSize);
             const pointMaterial = new THREE.MeshBasicMaterial(color);
             const point = new THREE.Mesh(pointGeometry, pointMaterial);
             point.position.set(x, y, z);
-
-            // Add the point as a child of the Earth mesh
-            earth.add(point);
             return point;
         }
 
@@ -429,12 +451,22 @@
         // Animation loop
         let t0 = new Date();
         let time = new Date();
-        let g = 9.8;
+        function getGValueFixed() {
+            return 9.8;
+        }
+        function getGValueAtHeight(s0,h) {
+            let g = 9.8;
+            let gValAtH = g*s0*s0/(h*h);//where h is R+H where H is height above earth surface
+            console.log("gValAtH "+h+"="+gValAtH);
+            return gValAtH;
+        }
         function animate() {
             requestAnimationFrame(animate);
 
             // Rotate the Earth
-            earth.rotation.y += 0.002;
+            if(!$("#earthRotationEnabled").checked) {
+                earth.rotation.y += 0.002;
+            }
             pointsToFireX.forEach(point=>{
                 point.position.x += 0.01;
             });
@@ -449,9 +481,9 @@
                 let s0 = pointObj[1];
                 let tt0 = pointObj[2];
                 let gScale = parseInt($("#gscale").value);
-                let gScaled = g * gScale;
+                let gScaled = getGValueFixed() * gScale;
                 if(pointObj[0].position.z>=s0) {
-                    let u = 5;
+                    let u = parseFloat($("#initialVelocity").value);
                     let tDiff = time.getTime()-tt0;
                     tDiff = tDiff/10000;//scaled down tDiff by 10000
                     let displacement = u*tDiff-0.5*gScaled*tDiff*tDiff;
