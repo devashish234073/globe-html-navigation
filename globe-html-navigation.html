@@ -421,8 +421,9 @@
         let renderer;
         let scene;
         let camera;
+        let geometry;
         function init() {
-            if(tmr!=null) {
+            if (tmr != null) {
                 clearInterval(tmr);
             }
             // Set up the scene
@@ -438,7 +439,7 @@
             document.body.appendChild(renderer.domElement);
 
             // Create a sphere (Earth)
-            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            geometry = new THREE.SphereGeometry(radius, 32, 32);
             //const textureLoader = new THREE.TextureLoader();
             //const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
             //const material = new THREE.MeshBasicMaterial({ map: texture });
@@ -464,11 +465,19 @@
                 navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
             }, 1000);
         }
-        
+        let initDone = false;
         function displayEarthRadius() {
             $("#earthRadiusSliderTxt").innerText = "Earth Radius: " + $("#earthRadiusSlider").value;
             radius = $("#earthRadiusSlider").value;
-            init();
+            if (!initDone) {
+                initDone = true;
+                init();
+            } else {
+                geometry.parameters.radius = radius;
+                geometry.radius = radius;
+                earth.scale.set(radius, radius, radius);
+                earth.updateMatrix();
+            }
         }
         displayEarthRadius();
         $("#earthRadiusSlider").addEventListener("change", displayEarthRadius);
