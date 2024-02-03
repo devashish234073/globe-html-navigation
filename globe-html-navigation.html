@@ -40,7 +40,7 @@
         }
 
         .experimental {
-            color:red;
+            color: red;
         }
     </style>
 </head>
@@ -88,7 +88,11 @@
             <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating
                 Points At A Bigger Radius</td>
         </tr>
-        <tr><td  colspan="2" class="experimental"><marquee>Experimental Features[bug prone]</marquee></td></tr>
+        <tr>
+            <td colspan="2" class="experimental">
+                <marquee>Experimental Features[bug prone]</marquee>
+            </td>
+        </tr>
         <tr>
             <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
             <td><span id="earthRadiusSliderTxt" class="experimental"></span></td>
@@ -475,7 +479,7 @@
         let initDone = false;
         function displayEarthRadius() {
             let radiusScale = parseFloat($("#earthRadiusSlider").value);
-            radius = originalRadius*radiusScale;
+            radius = originalRadius * radiusScale;
             $("#earthRadiusSliderTxt").innerText = "Earth Radius: " + radius.toFixed(2);
             if (!initDone) {
                 initDone = true;
@@ -514,7 +518,7 @@
         let currLocPoint = null;
         function geoSuccess(pos) {
             const crd = pos.coords;
-            if(currLocPoint==null) {
+            if (currLocPoint == null) {
                 currLocPoint = createPoint(radius, crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
                 earth.add(currLocPoint);
             } else {
@@ -546,7 +550,7 @@
             console.log("gValAtH " + h + "=" + gValAtH);
             return gValAtH;
         }
-        
+
         function animate() {
             requestAnimationFrame(animate);
 
@@ -627,7 +631,37 @@
             renderer.render(scene, camera);
         }
 
-        animate();
+        let cameraMode = false;
+        cameraMode = confirm("Do you want to show camera in the background? Hit ok for yes and cancel for no.");
+        if (!cameraMode) {
+            animate();
+        } else {
+            const planeGeometry = new THREE.PlaneGeometry(16, 9); // Adjust the size of the plane
+            const planeMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+            });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            scene.add(plane);
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then((stream) => {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+
+                    const videoTexture = new THREE.VideoTexture(video);
+                    videoTexture.minFilter = THREE.LinearFilter;
+                    videoTexture.magFilter = THREE.LinearFilter;
+
+                    plane.material.map = videoTexture;
+
+                    animate();
+                })
+                .catch((error) => {
+                    console.error('Error accessing webcam:', error);
+                });
+        }
     </script>
 </body>
 
