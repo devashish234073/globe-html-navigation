@@ -47,10 +47,6 @@
 <body>
     <table id="paramsTable">
         <tr>
-            <td><input type="range" value="3" min="1" max="7" step="0.05" id="earthRadiusSlider"></td>
-            <td><span id="earthRadiusSliderTxt"></span></td>
-        </tr>
-        <tr>
             <td>Time</td>
             <td id="time"></td>
         </tr>
@@ -86,6 +82,11 @@
         <tr>
             <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating
                 Points At A Bigger Radius</td>
+        </tr>
+        <tr><td  colspan="2"><marquee>Experimental Features[bug prone]</marquee></td></tr>
+        <tr>
+            <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
+            <td><span id="earthRadiusSliderTxt"></span></td>
         </tr>
     </table>
     <script>
@@ -415,7 +416,8 @@
             [11.07518, 79.85723],//veppancheri beach
             [11.09131, 79.85649],//chinnangudi beach
         ];
-        let radius = 3;
+        const originalRadius = 3;
+        let radius = originalRadius;
         let tmr = null;
         let earth;
         let renderer;
@@ -467,16 +469,16 @@
         }
         let initDone = false;
         function displayEarthRadius() {
-            $("#earthRadiusSliderTxt").innerText = "Earth Radius: " + $("#earthRadiusSlider").value;
-            let oldRadius = radius;
-            radius = $("#earthRadiusSlider").value;
+            let radiusScale = parseFloat($("#earthRadiusSlider").value);
+            radius = originalRadius*radiusScale;
+            $("#earthRadiusSliderTxt").innerText = "Earth Radius: " + radius.toFixed(2);
             if (!initDone) {
                 initDone = true;
                 init();
             } else {
                 geometry.parameters.radius = radius;
                 geometry.radius = radius;
-                earth.scale.set(radius/oldRadius, radius/oldRadius, radius/oldRadius);
+                earth.scale.set(radiusScale, radiusScale, radiusScale);
                 earth.updateMatrix();
             }
         }
@@ -495,9 +497,18 @@
         $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
 
         let firstTimeCoordinatesSet = false;
+        let currLocPoint = null;
         function geoSuccess(pos) {
             const crd = pos.coords;
-            addPoint(crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+            if(currLocPoint==null) {
+                currLocPoint = createPoint(radius, crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+                earth.add(currLocPoint);
+            } else {
+                let tmpPoint = createPoint(radius, crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+                currLocPoint.position.x = tmpPoint.position.x;
+                currLocPoint.position.y = tmpPoint.position.y;
+                currLocPoint.position.z = tmpPoint.position.z;
+            }
             if (!firstTimeCoordinatesSet) {//This runs only once
                 $("#latitude").value = crd.latitude;
                 $("#longitude").value = crd.longitude;
