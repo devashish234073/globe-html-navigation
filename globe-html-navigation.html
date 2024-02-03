@@ -61,6 +61,9 @@
             <td colspan="2"><button onclick="fireZWithGravity()">FireZ With Gravity</button></td>
         </tr>
         <tr>
+            <td colspan="2"><button onclick="fireXYZWithGravity()">Fire 'XYZ' With Gravity</button></td>
+        </tr>
+        <tr>
             <td colspan="2"><input type="checkbox" id="earthRotationEnabled">Stop Earth's Rotation</td>
         </tr>
         <tr>
@@ -75,6 +78,7 @@
         let pointsToFireY = [];
         let pointsToFireZ = [];
         let pointsToFireZWithGravity = [];
+        let pointsToFireXYZWithGravity = [];
         function fireX() {
             if($("#latitude").value=="" || $("#longitude").value=="") {
                 alert("Please enter latitude and longitude values");
@@ -106,6 +110,15 @@
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 let t0 = new Date();
                 pointsToFireZWithGravity.push([point,point.position.z,t0.getTime()]);
+            }
+        }
+        function fireXYZWithGravity() {
+            if($("#latitude").value=="" || $("#longitude").value=="") {
+                alert("Please enter latitude and longitude values");
+            } else {
+                let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
+                let t0 = new Date();
+                pointsToFireXYZWithGravity.push([point,[point.position.x,point.position.y,point.position.z],t0.getTime()]);
             }
         }
         function displayGScale() {
@@ -492,6 +505,47 @@
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
                         pointObj[0].position.z = s0-0.01;//placing it slightly lower to prevent logic from re-running
+                    }
+                }
+            });
+            pointsToFireXYZWithGravity.forEach(pointObj=>{
+                let sx0 = pointObj[1][0]/radius;//unit vector x along line connecting (0,0,0) and the point
+                let sy0 = pointObj[1][1]/radius;//unit vector y along line connecting (0,0,0) and the point
+                let sz0 = pointObj[1][2]/radius;//unit vector z along line connecting (0,0,0) and the point
+                let tt0 = pointObj[2];
+                let gScale = parseInt($("#gscale").value);
+                let gScaled = getGValueFixed() * gScale;
+                let x_2 = pointObj[0].position.x*pointObj[0].position.x;
+                let y_2 = pointObj[0].position.y*pointObj[0].position.y;
+                let z_2 = pointObj[0].position.z*pointObj[0].position.z;
+                let radialDistance = Math.sqrt(x_2+y_2+z_2);
+                console.log(radialDistance,radius-0.001);
+                if(radialDistance>=radius-0.001) {
+                    let ux0 = sx0*parseFloat($("#initialVelocity").value);
+                    let uy0 = sy0*parseFloat($("#initialVelocity").value);
+                    let uz0 = sz0*parseFloat($("#initialVelocity").value);
+                    //console.log("u vector",ux0+"i+"+uy0+"j+"+uz0+"z");
+                    let gx0 = sx0*gScaled;
+                    let gy0 = sy0*gScaled;
+                    let gz0 = sz0*gScaled;
+                    //console.log("g vector",gx0+"i+"+gy0+"j+"+gz0+"z");
+                    let tDiff = time.getTime()-tt0;
+                    tDiff = tDiff/10000;//scaled down tDiff by 10000
+                    let displacementX0 = ux0*tDiff-0.5*gx0*tDiff*tDiff;
+                    let displacementY0 = uy0*tDiff-0.5*gy0*tDiff*tDiff;
+                    let displacementZ0 = uz0*tDiff-0.5*gz0*tDiff*tDiff;
+                    let displacementMagnitude = Math.sqrt(displacementX0*displacementX0+displacementY0*displacementY0+displacementZ0*displacementZ0);
+                    //console.log("displacementMagnitude",displacementMagnitude);
+                    if(displacementMagnitude>0) {
+                        pointObj[0].position.x = pointObj[1][0] + displacementX0;
+                        pointObj[0].position.y = pointObj[1][1] + displacementY0;
+                        pointObj[0].position.z = pointObj[1][2] + displacementZ0;
+                        //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
+                    } else {
+                        //placing it slightly lower to prevent logic from re-running
+                        pointObj[0].position.x = sx0 - (0.01*sx0);
+                        pointObj[0].position.y = sy0 - (0.01*sy0);
+                        pointObj[0].position.z = sz0 - (0.01*sz0);
                     }
                 }
             });
