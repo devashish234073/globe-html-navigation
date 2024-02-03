@@ -16,14 +16,11 @@
             padding: 5px;
             background-color: rgba(0, 0, 0, 0.5);
             position: fixed;
-            font-size: 12px;
+            font-size: 11px;
             color: yellow;
             border: 1px solid lightgreen;
             border-radius: 10px;
         }
-
-        #longitude,
-        #latitude {}
 
         #paramsTable input[type='number'] {
             background-color: rgba(0, 0, 0, 0.5);
@@ -32,14 +29,18 @@
         }
 
         #paramsTable button {
-            height: 26px;
-            font-size: 15px;
+            height: 20px;
+            font-size: 13px;
             color: white;
             background-color: rgba(0, 0, 0, 0.5);
         }
 
         #paramsTable button:active {
             background-color: blue;
+        }
+
+        .experimental {
+            color:red;
         }
     </style>
 </head>
@@ -77,16 +78,20 @@
             <td colspan="2"><button onclick="fireXYZWithGravity()">Fire 'XYZ' With Gravity</button></td>
         </tr>
         <tr>
+            <td><input type="range" value="0.002" min="0.0001" max="0.07" step="0.0001" id="earthRotationSlider"></td>
+            <td><span id="earthRotationSliderTxt"></span></td>
+        </tr>
+        <tr>
             <td colspan="2"><input type="checkbox" id="earthRotationEnabled">Stop Earth's Rotation</td>
         </tr>
         <tr>
             <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating
                 Points At A Bigger Radius</td>
         </tr>
-        <tr><td  colspan="2"><marquee>Experimental Features[bug prone]</marquee></td></tr>
+        <tr><td  colspan="2" class="experimental"><marquee>Experimental Features[bug prone]</marquee></td></tr>
         <tr>
             <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
-            <td><span id="earthRadiusSliderTxt"></span></td>
+            <td><span id="earthRadiusSliderTxt" class="experimental"></span></td>
         </tr>
     </table>
     <script>
@@ -484,6 +489,7 @@
         }
         displayEarthRadius();
         $("#earthRadiusSlider").addEventListener("change", displayEarthRadius);
+
         function displayGScale() {
             $("#gscaleTxt").innerText = "'g' Scale: " + $("#gscale").value;
         }
@@ -495,6 +501,14 @@
         }
         displayInitialVelocityValue();
         $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
+
+        let rotationSpeed = 0.002;
+        function displayEarthRotation() {
+            $("#earthRotationSliderTxt").innerText = "Earth rotation speed: " + $("#earthRotationSlider").value;
+            rotationSpeed = parseFloat($("#earthRotationSlider").value);
+        }
+        displayEarthRotation();
+        $("#earthRotationSlider").addEventListener("change", displayEarthRotation);
 
         let firstTimeCoordinatesSet = false;
         let currLocPoint = null;
@@ -532,12 +546,13 @@
             console.log("gValAtH " + h + "=" + gValAtH);
             return gValAtH;
         }
+        
         function animate() {
             requestAnimationFrame(animate);
 
             // Rotate the Earth
             if (!$("#earthRotationEnabled").checked) {
-                earth.rotation.y += 0.002;
+                earth.rotation.y += rotationSpeed;
             }
             pointsToFireX.forEach(point => {
                 point.position.x += 0.01;
