@@ -47,6 +47,10 @@
 <body>
     <table id="paramsTable">
         <tr>
+            <td><input type="range" value="3" min="1" max="4" step="0.05" id="earthRadiusSlider"></td>
+            <td><span id="earthRadiusSliderTxt"></span></td>
+        </tr>
+        <tr>
             <td>Time</td>
             <td id="time"></td>
         </tr>
@@ -135,17 +139,6 @@
                 pointsToFireXYZWithGravity.push([point, [point.position.x, point.position.y, point.position.z], t0.getTime()]);
             }
         }
-        function displayGScale() {
-            $("#gscaleTxt").innerText = "'g' Scale: " + $("#gscale").value;
-        }
-        displayGScale();
-        $("#gscale").addEventListener("change", displayGScale);
-
-        function displayInitialVelocityValue() {
-            $("#initialVelocityTxt").innerText = "Initial Velocity: " + $("#initialVelocity").value;
-        }
-        displayInitialVelocityValue();
-        $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
 
         function addPoint(latitude, longitude, cityPointSize, color) {
             let point = createPoint(radius, latitude, longitude, cityPointSize, color);
@@ -422,13 +415,16 @@
             [11.07518, 79.85723],//veppancheri beach
             [11.09131, 79.85649],//chinnangudi beach
         ];
-
         let radius = 3;
+        let tmr = null;
         let earth;
         let renderer;
         let scene;
         let camera;
         function init() {
+            if(tmr!=null) {
+                clearInterval(tmr);
+            }
             // Set up the scene
             scene = new THREE.Scene();
 
@@ -463,13 +459,30 @@
             beachesOrBorderToPlot.forEach((coords) => {
                 addPoint(coords[0], coords[1], dotOnBorder, { color: 0x00ffff });
             });
+            //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+            tmr = setInterval(function () {
+                navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+            }, 1000);
         }
-        //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
-        setInterval(function () {
-            navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
-        }, 1000);
+        
+        function displayEarthRadius() {
+            $("#earthRadiusSliderTxt").innerText = "Earth Radius: " + $("#earthRadiusSlider").value;
+            radius = $("#earthRadiusSlider").value;
+            init();
+        }
+        displayEarthRadius();
+        $("#earthRadiusSlider").addEventListener("change", displayEarthRadius);
+        function displayGScale() {
+            $("#gscaleTxt").innerText = "'g' Scale: " + $("#gscale").value;
+        }
+        displayGScale();
+        $("#gscale").addEventListener("change", displayGScale);
 
-        init();
+        function displayInitialVelocityValue() {
+            $("#initialVelocityTxt").innerText = "Initial Velocity: " + $("#initialVelocity").value;
+        }
+        displayInitialVelocityValue();
+        $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
 
         let firstTimeCoordinatesSet = false;
         function geoSuccess(pos) {
@@ -544,7 +557,7 @@
                 let y_2 = pointObj[0].position.y * pointObj[0].position.y;
                 let z_2 = pointObj[0].position.z * pointObj[0].position.z;
                 let radialDistance = Math.sqrt(x_2 + y_2 + z_2);
-                console.log(radialDistance, radius - 0.001);
+                //console.log(radialDistance, radius - 0.001);
                 if (radialDistance >= radius - 0.001) {
                     let ux0 = sx0 * parseFloat($("#initialVelocity").value);
                     let uy0 = sy0 * parseFloat($("#initialVelocity").value);
