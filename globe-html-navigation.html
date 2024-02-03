@@ -1,61 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Earth with Coordinates</title>
     <!-- <script src="https://threejs.org/build/three.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js" integrity="sha512-vnmn/Qqn6aG0POAc9mIGzjq0IybrvxJXYDafNvp9JSnDGxeF3pbkSqLvf+YGd5ku63pT7sa/jxHn7/d0mU8+tA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.1/three.min.js"
+        integrity="sha512-vnmn/Qqn6aG0POAc9mIGzjq0IybrvxJXYDafNvp9JSnDGxeF3pbkSqLvf+YGd5ku63pT7sa/jxHn7/d0mU8+tA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         #paramsTable {
-            margin-left:10px;
-            margin-top:10px;
-            padding:5px;
-            background-color: rgba(0,0,0,0.5);
+            margin-left: 10px;
+            margin-top: 10px;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
             position: fixed;
-            font-size:12px;
-            color:yellow;
-            border:1px solid lightgreen;
+            font-size: 12px;
+            color: yellow;
+            border: 1px solid lightgreen;
             border-radius: 10px;
         }
-        #longitude, #latitude {
-            
-        }
+
+        #longitude,
+        #latitude {}
+
         #paramsTable input[type='number'] {
-            background-color: rgba(0,0,0,0.5);
-            color:lightgreen;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: lightgreen;
             width: 80px;
         }
+
         #paramsTable button {
-            height:26px;
-            font-size:15px;
-            color:white;
-            background-color: rgba(0,0,0,0.5);
+            height: 26px;
+            font-size: 15px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
         }
+
         #paramsTable button:active {
             background-color: blue;
         }
     </style>
 </head>
+
 <body>
     <table id="paramsTable">
         <tr>
-            <td>Time</td><td id="time"></td>
+            <td>Time</td>
+            <td id="time"></td>
         </tr>
         <tr>
-            <td>Latitude</td><td><input type="number" id="latitude"></td>
+            <td>Latitude</td>
+            <td><input type="number" id="latitude"></td>
         </tr>
         <tr>
-            <td>Longitude</td><td><input type="number" id="longitude"></td>
+            <td>Longitude</td>
+            <td><input type="number" id="longitude"></td>
         </tr>
         <tr>
-            <td colspan="2"><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button onclick="fireZ()">FireZ</button></td>
+            <td colspan="2"><button onclick="fireX()">FireX</button><button onclick="fireY()">FireY</button><button
+                    onclick="fireZ()">FireZ</button></td>
         </tr>
         <tr>
-            <td><input type="range" value="1" min="0.05" max="10" step="0.05" id="gscale"></td><td><span id="gscaleTxt"></span></td>
+            <td><input type="range" value="1" min="0.05" max="10" step="0.05" id="gscale"></td>
+            <td><span id="gscaleTxt"></span></td>
         </tr>
         <tr>
-            <td><input type="range" value="5" min="0.05" max="20" step="0.05" id="initialVelocity"></td><td><span id="initialVelocityTxt"></span></td>
+            <td><input type="range" value="5" min="0.05" max="20" step="0.05" id="initialVelocity"></td>
+            <td><span id="initialVelocityTxt"></span></td>
         </tr>
         <tr>
             <td colspan="2"><button onclick="fireZWithGravity()">FireZ With Gravity</button></td>
@@ -67,7 +80,8 @@
             <td colspan="2"><input type="checkbox" id="earthRotationEnabled">Stop Earth's Rotation</td>
         </tr>
         <tr>
-            <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating Points At A Bigger Radius</td>
+            <td colspan="2"><input type="checkbox" id="drawFloatingPointsAtBiggerRadius" checked="true">Draw Floating
+                Points At A Bigger Radius</td>
         </tr>
     </table>
     <script>
@@ -80,7 +94,7 @@
         let pointsToFireZWithGravity = [];
         let pointsToFireXYZWithGravity = [];
         function fireX() {
-            if($("#latitude").value=="" || $("#longitude").value=="") {
+            if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xffaaff });
@@ -88,7 +102,7 @@
             }
         }
         function fireY() {
-            if($("#latitude").value=="" || $("#longitude").value=="") {
+            if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xff22ff });
@@ -96,7 +110,7 @@
             }
         }
         function fireZ() {
-            if($("#latitude").value=="" || $("#longitude").value=="") {
+            if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
@@ -104,73 +118,46 @@
             }
         }
         function fireZWithGravity() {
-            if($("#latitude").value=="" || $("#longitude").value=="") {
+            if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 let t0 = new Date();
-                pointsToFireZWithGravity.push([point,point.position.z,t0.getTime()]);
+                pointsToFireZWithGravity.push([point, point.position.z, t0.getTime()]);
             }
         }
         function fireXYZWithGravity() {
-            if($("#latitude").value=="" || $("#longitude").value=="") {
+            if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 let t0 = new Date();
-                pointsToFireXYZWithGravity.push([point,[point.position.x,point.position.y,point.position.z],t0.getTime()]);
+                pointsToFireXYZWithGravity.push([point, [point.position.x, point.position.y, point.position.z], t0.getTime()]);
             }
         }
         function displayGScale() {
-            $("#gscaleTxt").innerText = "'g' Scale: "+$("#gscale").value;
+            $("#gscaleTxt").innerText = "'g' Scale: " + $("#gscale").value;
         }
         displayGScale();
-        $("#gscale").addEventListener("change",displayGScale);
+        $("#gscale").addEventListener("change", displayGScale);
 
         function displayInitialVelocityValue() {
-            $("#initialVelocityTxt").innerText = "Initial Velocity: "+$("#initialVelocity").value;
+            $("#initialVelocityTxt").innerText = "Initial Velocity: " + $("#initialVelocity").value;
         }
         displayInitialVelocityValue();
-        $("#initialVelocity").addEventListener("change",displayInitialVelocityValue);
-        // Set up the scene
-        const scene = new THREE.Scene();
+        $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
 
-        // Set up the camera
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-
-        // Set up the renderer
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Create a sphere (Earth)
-        let radius = 3;
-        const geometry = new THREE.SphereGeometry(radius, 32, 32);
-        //const textureLoader = new THREE.TextureLoader();
-        //const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
-        //const material = new THREE.MeshBasicMaterial({ map: texture });
-        const material = new THREE.MeshBasicMaterial({ color: 0xaaafa6 });
-        const earth = new THREE.Mesh(geometry, material);
-        scene.add(earth);
-
-        // Create a wireframe mesh
-        const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x888d84, linewidth: 2 });
-        const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
-        earth.add(wireframe);
-
-        // Function to add a point based on latitude and longitude
         function addPoint(latitude, longitude, cityPointSize, color) {
             let point = createPoint(radius, latitude, longitude, cityPointSize, color);
             earth.add(point);
-            if($("#drawFloatingPointsAtBiggerRadius").checked) {
-                let point2 = createPoint(radius*1.2, latitude, longitude, cityPointSize, color);
+            if ($("#drawFloatingPointsAtBiggerRadius").checked) {
+                let point2 = createPoint(radius * 1.2, latitude, longitude, cityPointSize, color);
                 earth.add(point2);
             }
             return point;
         }
 
+        // Function to add a point based on latitude and longitude
         function createPoint(radiusOfSphere, latitude, longitude, cityPointSize, color) {
             const phi = (90 - latitude) * Math.PI / 180;
             const theta = (180 - longitude) * Math.PI / 180;
@@ -201,9 +188,6 @@
             [23.0225, 72.5714],//ahmedabad
             [26.1433, 91.7898], //dispur
         ];
-        citiesToPlot.forEach((coords)=>{
-            addPoint(coords[0],coords[1],cityPointSize, { color: 0x0000ff });
-        });
         //Boundaries or Beaches
         let beachesOrBorderToPlot = [
             //GUJARAT
@@ -438,23 +422,64 @@
             [11.07518, 79.85723],//veppancheri beach
             [11.09131, 79.85649],//chinnangudi beach
         ];
-        beachesOrBorderToPlot.forEach((coords)=>{
-            addPoint(coords[0],coords[1],dotOnBorder, { color: 0x00ffff });
-        });
+
+        let radius = 3;
+        let earth;
+        let renderer;
+        let scene;
+        let camera;
+        function init() {
+            // Set up the scene
+            scene = new THREE.Scene();
+
+            // Set up the camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Set up the renderer
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Create a sphere (Earth)
+            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            //const textureLoader = new THREE.TextureLoader();
+            //const texture = textureLoader.load('https://threejsfundamentals.org/threejs/resources/images/wall.jpg'); // You can replace this with your Earth texture
+            //const material = new THREE.MeshBasicMaterial({ map: texture });
+            const material = new THREE.MeshBasicMaterial({ color: 0xaaafa6 });
+            earth = new THREE.Mesh(geometry, material);
+            scene.add(earth);
+
+            // Create a wireframe mesh
+            const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0x888d84, linewidth: 2 });
+            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+            earth.add(wireframe);
+
+            citiesToPlot.forEach((coords) => {
+                addPoint(coords[0], coords[1], cityPointSize, { color: 0x0000ff });
+            });
+
+            beachesOrBorderToPlot.forEach((coords) => {
+                addPoint(coords[0], coords[1], dotOnBorder, { color: 0x00ffff });
+            });
+        }
         //reference doc --> https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
-        setInterval(function() {
+        setInterval(function () {
             navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
         }, 1000);
 
+        init();
+
         let firstTimeCoordinatesSet = false;
         function geoSuccess(pos) {
-          const crd = pos.coords;
-          addPoint(crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
-          if(!firstTimeCoordinatesSet) {//This runs only once
-            $("#latitude").value = crd.latitude;
-            $("#longitude").value = crd.longitude;
-            firstTimeCoordinatesSet = true;
-          }
+            const crd = pos.coords;
+            addPoint(crd.latitude, crd.longitude, 0.03, { color: 0xff00ff });
+            if (!firstTimeCoordinatesSet) {//This runs only once
+                $("#latitude").value = crd.latitude;
+                $("#longitude").value = crd.longitude;
+                firstTimeCoordinatesSet = true;
+            }
         }
 
         function geoError(error) {
@@ -467,93 +492,94 @@
         function getGValueFixed() {
             return 9.8;
         }
-        function getGValueAtHeight(s0,h) {
+        function getGValueAtHeight(s0, h) {
             let g = 9.8;
-            let gValAtH = g*s0*s0/(h*h);//where h is R+H where H is height above earth surface
-            console.log("gValAtH "+h+"="+gValAtH);
+            let gValAtH = g * s0 * s0 / (h * h);//where h is R+H where H is height above earth surface
+            console.log("gValAtH " + h + "=" + gValAtH);
             return gValAtH;
         }
         function animate() {
             requestAnimationFrame(animate);
 
             // Rotate the Earth
-            if(!$("#earthRotationEnabled").checked) {
+            if (!$("#earthRotationEnabled").checked) {
                 earth.rotation.y += 0.002;
             }
-            pointsToFireX.forEach(point=>{
+            pointsToFireX.forEach(point => {
                 point.position.x += 0.01;
             });
-            pointsToFireY.forEach(point=>{
+            pointsToFireY.forEach(point => {
                 point.position.y += 0.01;
             });
-            pointsToFireZ.forEach(point=>{
+            pointsToFireZ.forEach(point => {
                 point.position.z += 0.01;
             });
             time = new Date();
-            pointsToFireZWithGravity.forEach(pointObj=>{
+            pointsToFireZWithGravity.forEach(pointObj => {
                 let s0 = pointObj[1];
                 let tt0 = pointObj[2];
                 let gScale = parseInt($("#gscale").value);
                 let gScaled = getGValueFixed() * gScale;
-                if(pointObj[0].position.z>=s0) {
+                if (pointObj[0].position.z >= s0) {
                     let u = parseFloat($("#initialVelocity").value);
-                    let tDiff = time.getTime()-tt0;
-                    tDiff = tDiff/10000;//scaled down tDiff by 10000
-                    let displacement = u*tDiff-0.5*gScaled*tDiff*tDiff;
-                    if(displacement>0) {
+                    let tDiff = time.getTime() - tt0;
+                    tDiff = tDiff / 10000;//scaled down tDiff by 10000
+                    let displacement = u * tDiff - 0.5 * gScaled * tDiff * tDiff;
+                    if (displacement > 0) {
                         pointObj[0].position.z = s0 + displacement;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
-                        pointObj[0].position.z = s0-0.01;//placing it slightly lower to prevent logic from re-running
+                        pointObj[0].position.z = s0 - 0.01;//placing it slightly lower to prevent logic from re-running
                     }
                 }
             });
-            pointsToFireXYZWithGravity.forEach(pointObj=>{
-                let sx0 = pointObj[1][0]/radius;//unit vector x along line connecting (0,0,0) and the point
-                let sy0 = pointObj[1][1]/radius;//unit vector y along line connecting (0,0,0) and the point
-                let sz0 = pointObj[1][2]/radius;//unit vector z along line connecting (0,0,0) and the point
+            pointsToFireXYZWithGravity.forEach(pointObj => {
+                let sx0 = pointObj[1][0] / radius;//unit vector x along line connecting (0,0,0) and the point
+                let sy0 = pointObj[1][1] / radius;//unit vector y along line connecting (0,0,0) and the point
+                let sz0 = pointObj[1][2] / radius;//unit vector z along line connecting (0,0,0) and the point
                 let tt0 = pointObj[2];
                 let gScale = parseInt($("#gscale").value);
                 let gScaled = getGValueFixed() * gScale;
-                let x_2 = pointObj[0].position.x*pointObj[0].position.x;
-                let y_2 = pointObj[0].position.y*pointObj[0].position.y;
-                let z_2 = pointObj[0].position.z*pointObj[0].position.z;
-                let radialDistance = Math.sqrt(x_2+y_2+z_2);
-                console.log(radialDistance,radius-0.001);
-                if(radialDistance>=radius-0.001) {
-                    let ux0 = sx0*parseFloat($("#initialVelocity").value);
-                    let uy0 = sy0*parseFloat($("#initialVelocity").value);
-                    let uz0 = sz0*parseFloat($("#initialVelocity").value);
+                let x_2 = pointObj[0].position.x * pointObj[0].position.x;
+                let y_2 = pointObj[0].position.y * pointObj[0].position.y;
+                let z_2 = pointObj[0].position.z * pointObj[0].position.z;
+                let radialDistance = Math.sqrt(x_2 + y_2 + z_2);
+                console.log(radialDistance, radius - 0.001);
+                if (radialDistance >= radius - 0.001) {
+                    let ux0 = sx0 * parseFloat($("#initialVelocity").value);
+                    let uy0 = sy0 * parseFloat($("#initialVelocity").value);
+                    let uz0 = sz0 * parseFloat($("#initialVelocity").value);
                     //console.log("u vector",ux0+"i+"+uy0+"j+"+uz0+"z");
-                    let gx0 = sx0*gScaled;
-                    let gy0 = sy0*gScaled;
-                    let gz0 = sz0*gScaled;
+                    let gx0 = sx0 * gScaled;
+                    let gy0 = sy0 * gScaled;
+                    let gz0 = sz0 * gScaled;
                     //console.log("g vector",gx0+"i+"+gy0+"j+"+gz0+"z");
-                    let tDiff = time.getTime()-tt0;
-                    tDiff = tDiff/10000;//scaled down tDiff by 10000
-                    let displacementX0 = ux0*tDiff-0.5*gx0*tDiff*tDiff;
-                    let displacementY0 = uy0*tDiff-0.5*gy0*tDiff*tDiff;
-                    let displacementZ0 = uz0*tDiff-0.5*gz0*tDiff*tDiff;
-                    let displacementMagnitude = Math.sqrt(displacementX0*displacementX0+displacementY0*displacementY0+displacementZ0*displacementZ0);
+                    let tDiff = time.getTime() - tt0;
+                    tDiff = tDiff / 10000;//scaled down tDiff by 10000
+                    let displacementX0 = ux0 * tDiff - 0.5 * gx0 * tDiff * tDiff;
+                    let displacementY0 = uy0 * tDiff - 0.5 * gy0 * tDiff * tDiff;
+                    let displacementZ0 = uz0 * tDiff - 0.5 * gz0 * tDiff * tDiff;
+                    let displacementMagnitude = Math.sqrt(displacementX0 * displacementX0 + displacementY0 * displacementY0 + displacementZ0 * displacementZ0);
                     //console.log("displacementMagnitude",displacementMagnitude);
-                    if(displacementMagnitude>0) {
+                    if (displacementMagnitude > 0) {
                         pointObj[0].position.x = pointObj[1][0] + displacementX0;
                         pointObj[0].position.y = pointObj[1][1] + displacementY0;
                         pointObj[0].position.z = pointObj[1][2] + displacementZ0;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
                         //placing it slightly lower to prevent logic from re-running
-                        pointObj[0].position.x = sx0 - (0.01*sx0);
-                        pointObj[0].position.y = sy0 - (0.01*sy0);
-                        pointObj[0].position.z = sz0 - (0.01*sz0);
+                        pointObj[0].position.x = sx0 - (0.01 * sx0);
+                        pointObj[0].position.y = sy0 - (0.01 * sy0);
+                        pointObj[0].position.z = sz0 - (0.01 * sz0);
                     }
                 }
             });
-            $("#time").innerText = ((time.getTime()-t0.getTime())/1000.0)+" sec";
+            $("#time").innerText = ((time.getTime() - t0.getTime()) / 1000.0) + " sec";
             renderer.render(scene, camera);
         }
 
         animate();
     </script>
 </body>
+
 </html>
