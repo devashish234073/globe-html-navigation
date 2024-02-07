@@ -94,11 +94,16 @@
             </td>
         </tr>
         <tr>
-            <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
-            <td><span id="earthRadiusSliderTxt" class="experimental"></span></td>
+            <td><input type="range" value="8" min="5" max="50" step="0.05" id="xDrift"></td>
+            <td><span id="xDriftTxt"></span></td>
         </tr>
         <tr>
-            <td colspan="2"><button onclick="fireXYZWithGravityVaryingWithHeight()">Fire 'XYZ' With Gravity Varying With Height</button></td>
+            <td colspan="2"><button id="xyzVarHtBtn" onclick="fireXYZWithGravityVaryingWithHeight()">Fire 'XYZ' With
+                    Gravity Varying With Height</button></td>
+        </tr>
+        <tr>
+            <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
+            <td><span id="earthRadiusSliderTxt" class="experimental"></span></td>
         </tr>
     </table>
     <script>
@@ -111,6 +116,7 @@
         let pointsToFireZWithGravity = [];
         let pointsToFireXYZWithGravity = [];
         let pointsToFireXYZWithGravityVaryingWithHeight = [];
+        const RADIUS_OF_EARTH = 6371000;//in metres
         function fireX() {
             if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
@@ -173,6 +179,16 @@
             }
             return point;
         }
+
+        /*setTimeout(function () {
+            setInterval(function () {
+                console.log("old value", $("#xDrift").value);
+                $("#xDrift").value = (parseFloat($("#xDrift").value)+0.05).toFixed(2);
+                //console.log("new value", $("#xDrift").value);
+                displayXDrift();
+                $("#xyzVarHtBtn").click();
+            }, 500);
+        }, 5000);*/
 
         // Function to add a point based on latitude and longitude
         function createPoint(radiusOfSphere, latitude, longitude, cityPointSize, color) {
@@ -514,6 +530,12 @@
         displayGScale();
         $("#gscale").addEventListener("change", displayGScale);
 
+        function displayXDrift() {
+            $("#xDriftTxt").innerText = "x Drift: " + $("#xDrift").value;
+        }
+        displayXDrift();
+        $("#xDrift").addEventListener("change", displayXDrift);
+
         function displayInitialVelocityValue() {
             $("#initialVelocityTxt").innerText = "Initial Velocity: " + $("#initialVelocity").value;
         }
@@ -582,25 +604,28 @@
                 point.position.z += 0.01;
             });
             time = new Date();
-            pointsToFireZWithGravity.forEach(pointObj => {
+            pointsToFireZWithGravity.forEach((pointObj,i) => {
                 let s0 = pointObj[1];
                 let tt0 = pointObj[2];
                 let gScale = parseInt($("#gscale").value);
                 let gScaled = getGValueFixed() * gScale;
-                if (pointObj[0].position.z >= s0) {
+                //if (pointObj[0].position.z >= s0) {
                     let u = parseFloat($("#initialVelocity").value);
                     let tDiff = time.getTime() - tt0;
                     tDiff = tDiff / 10000;//scaled down tDiff by 10000
                     let displacement = u * tDiff - 0.5 * gScaled * tDiff * tDiff;
-                    if (displacement > 0) {
-                        pointObj[0].position.z = s0 + displacement;
+                    let newPos = s0 + displacement;
+                    if (newPos > s0) {
+                        pointObj[0].position.z = newPos;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
-                        pointObj[0].position.z = s0 - 0.01;//placing it slightly lower to prevent logic from re-running
+                        pointsToFireZWithGravity.splice(i,1);
+                        console.log(pointObj[0],"Point removed from pointsToFireZWithGravity");
+                        earth.remove(pointObj[0]);
                     }
-                }
+                //}
             });
-            pointsToFireXYZWithGravity.forEach(pointObj => {
+            pointsToFireXYZWithGravity.forEach((pointObj,i) => {
                 let sx0 = pointObj[1][0] / radius;//unit vector x along line connecting (0,0,0) and the point
                 let sy0 = pointObj[1][1] / radius;//unit vector y along line connecting (0,0,0) and the point
                 let sz0 = pointObj[1][2] / radius;//unit vector z along line connecting (0,0,0) and the point
@@ -612,7 +637,7 @@
                 let z_2 = pointObj[0].position.z * pointObj[0].position.z;
                 let radialDistance = Math.sqrt(x_2 + y_2 + z_2);
                 //console.log(radialDistance, radius - 0.001);
-                if (radialDistance >= radius - 0.001) {
+                //if (radialDistance >= radius - 0.001) {
                     let ux0 = sx0 * parseFloat($("#initialVelocity").value);
                     let uy0 = sy0 * parseFloat($("#initialVelocity").value);
                     let uz0 = sz0 * parseFloat($("#initialVelocity").value);
@@ -626,22 +651,27 @@
                     let displacementX0 = ux0 * tDiff - 0.5 * gx0 * tDiff * tDiff;
                     let displacementY0 = uy0 * tDiff - 0.5 * gy0 * tDiff * tDiff;
                     let displacementZ0 = uz0 * tDiff - 0.5 * gz0 * tDiff * tDiff;
-                    let displacementMagnitude = Math.sqrt(displacementX0 * displacementX0 + displacementY0 * displacementY0 + displacementZ0 * displacementZ0);
+                    
                     //console.log("displacementMagnitude",displacementMagnitude);
-                    if (displacementMagnitude > 0) {
-                        pointObj[0].position.x = pointObj[1][0] + displacementX0;
-                        pointObj[0].position.y = pointObj[1][1] + displacementY0;
-                        pointObj[0].position.z = pointObj[1][2] + displacementZ0;
+                    let newPosX = pointObj[1][0] + displacementX0;
+                    let newPosY = pointObj[1][1] + displacementY0;
+                    let newPosZ = pointObj[1][2] + displacementZ0;
+
+                    let displacementMagnitude = Math.sqrt(newPosX * newPosX + newPosY * newPosY + newPosZ * newPosZ);
+
+                    if (displacementMagnitude > radius) {
+                        pointObj[0].position.x = newPosX;
+                        pointObj[0].position.y = newPosY;
+                        pointObj[0].position.z = newPosZ;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
-                        //placing it slightly lower to prevent logic from re-running
-                        pointObj[0].position.x = sx0 - (0.01 * sx0);
-                        pointObj[0].position.y = sy0 - (0.01 * sy0);
-                        pointObj[0].position.z = sz0 - (0.01 * sz0);
+                        pointsToFireXYZWithGravity.splice(i,1);
+                        console.log(pointObj[0],"Point removed from pointsToFireXYZWithGravity");
+                        earth.remove(pointObj[0]);
                     }
-                }
+                //}
             });
-            pointsToFireXYZWithGravityVaryingWithHeight.forEach(pointObj => {
+            pointsToFireXYZWithGravityVaryingWithHeight.forEach((pointObj,i) => {
                 let sx0 = pointObj[1][0] / radius;//unit vector x along line connecting (0,0,0) and the point
                 let sy0 = pointObj[1][1] / radius;//unit vector y along line connecting (0,0,0) and the point
                 let sz0 = pointObj[1][2] / radius;//unit vector z along line connecting (0,0,0) and the point
@@ -651,36 +681,46 @@
                 let y_2 = pointObj[0].position.y * pointObj[0].position.y;
                 let z_2 = pointObj[0].position.z * pointObj[0].position.z;
                 let radialDistance = Math.sqrt(x_2 + y_2 + z_2);
-                let gScaled = getGValueAtHeight(radius,radialDistance) * gScale;
-                //console.log(radialDistance, radius - 0.001);
-                if (radialDistance >= radius - 0.001) {
-                    let ux0 = sx0 * parseFloat($("#initialVelocity").value);
-                    let uy0 = sy0 * parseFloat($("#initialVelocity").value);
-                    let uz0 = sz0 * parseFloat($("#initialVelocity").value);
+                let gScaled = getGValueAtHeight(RADIUS_OF_EARTH, (radialDistance*RADIUS_OF_EARTH)/radius) * gScale;
+                //console.log(radialDistance, radius - 0.000001);
+                //if (radialDistance >= radius - 0.000001) {
+                    let ux0 = sx0 * 7000;// parseFloat($("#initialVelocity").value);
+                    let uy0 = sy0 * 7000;// parseFloat($("#initialVelocity").value);
+                    let uz0 = sz0 * 7000;// parseFloat($("#initialVelocity").value);
                     //console.log("u vector",ux0+"i+"+uy0+"j+"+uz0+"z");
                     let gx0 = sx0 * gScaled;
                     let gy0 = sy0 * gScaled;
                     let gz0 = sz0 * gScaled;
                     //console.log("g vector",gx0+"i+"+gy0+"j+"+gz0+"z");
                     let tDiff = time.getTime() - tt0;
-                    tDiff = tDiff / 10000;//scaled down tDiff by 10000
-                    let displacementX0 = ux0 * tDiff - 0.5 * gx0 * tDiff * tDiff;
-                    let displacementY0 = uy0 * tDiff - 0.5 * gy0 * tDiff * tDiff;
-                    let displacementZ0 = uz0 * tDiff - 0.5 * gz0 * tDiff * tDiff;
-                    let displacementMagnitude = Math.sqrt(displacementX0 * displacementX0 + displacementY0 * displacementY0 + displacementZ0 * displacementZ0);
-                    //console.log("displacementMagnitude",displacementMagnitude);
-                    if (displacementMagnitude > 0) {
-                        pointObj[0].position.x = pointObj[1][0] + displacementX0;
-                        pointObj[0].position.y = pointObj[1][1] + displacementY0;
-                        pointObj[0].position.z = pointObj[1][2] + displacementZ0;
+                    tDiff = tDiff/1000;//time in seconds
+                    tDiff*=100;//zoom the time
+                    let displacementX0 = ux0 * tDiff - (0.5 * gx0 * tDiff * tDiff);// + (radialDistance > 3 ? parseFloat($("#xDrift").value) * tDiff : 0.0);
+                    let displacementY0 = uy0 * tDiff - (0.5 * gy0 * tDiff * tDiff);
+                    let displacementZ0 = uz0 * tDiff - (0.5 * gz0 * tDiff * tDiff);
+                    //scale the displacements to match the values in earth
+                    displacementX0*=(radius/RADIUS_OF_EARTH);
+                    displacementY0*=(radius/RADIUS_OF_EARTH);
+                    displacementZ0*=(radius/RADIUS_OF_EARTH);
+                    //console.log("after "+tDiff+" seconds ("+displacementX0+","+displacementY0+","+displacementZ0+")");
+                    
+                    let newPosX = pointObj[1][0] + displacementX0;
+                    let newPosY = pointObj[1][1] + displacementY0;
+                    let newPosZ = pointObj[1][2] + displacementZ0;
+
+                    let displacementMagnitude = Math.sqrt(newPosX * newPosX + newPosY * newPosY + newPosZ * newPosZ);
+
+                    if (displacementMagnitude > radius) {
+                        pointObj[0].position.x = newPosX;
+                        pointObj[0].position.y = newPosY;
+                        pointObj[0].position.z = newPosZ;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
                     } else {
-                        //placing it slightly lower to prevent logic from re-running
-                        pointObj[0].position.x = sx0 - (0.01 * sx0);
-                        pointObj[0].position.y = sy0 - (0.01 * sy0);
-                        pointObj[0].position.z = sz0 - (0.01 * sz0);
+                        pointsToFireXYZWithGravityVaryingWithHeight.splice(i,1);
+                        console.log(pointObj[0],"Point removed from pointsToFireXYZWithGravityVaryingWithHeight");
+                        earth.remove(pointObj[0]);
                     }
-                }
+                //}
             });
             $("#time").innerText = ((time.getTime() - t0.getTime()) / 1000.0) + " sec";
             renderer.render(scene, camera);
