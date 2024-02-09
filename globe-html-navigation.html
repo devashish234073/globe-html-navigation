@@ -39,8 +39,25 @@
             background-color: blue;
         }
 
+        #ballMetrics {
+            border-collapse: collapse;
+            border:1px solid cyan;
+        }
+
+        #ballMetrics td {
+            border:1px solid cyan;
+        }
+
         .experimental {
             color: red;
+        }
+
+        .up {
+            background-color: blue;
+        }
+
+        .down {
+            background-color: red;
         }
     </style>
 </head>
@@ -64,7 +81,7 @@
                     onclick="fireZ()">FireZ</button></td>
         </tr>
         <tr>
-            <td><input type="range" value="3.5" min="0.05" max="10" step="0.05" id="gscale"></td>
+            <td><input type="range" value="1" min="0.05" max="10" step="0.05" id="gscale"></td>
             <td><span id="gscaleTxt"></span></td>
         </tr>
         <tr>
@@ -94,12 +111,30 @@
             </td>
         </tr>
         <tr>
-            <td><input type="range" value="8" min="5" max="50" step="0.05" id="xDrift"></td>
-            <td><span id="xDriftTxt"></span></td>
-        </tr>
-        <tr>
             <td colspan="2"><button id="xyzVarHtBtn" onclick="fireXYZWithGravityVaryingWithHeight()">Fire 'XYZ' With
                     Gravity Varying With Height</button></td>
+        </tr>
+        <!--<tr>
+            <td><input type="range" value="8" min="500" max="50000" step="1" id="xDrift"></td>
+            <td><span id="xDriftTxt"></span></td>
+        </tr>-->
+        <tr>
+            <td id="initialVelocityMPerS"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table id="ballMetrics">
+                    <tr>
+                        <td>Height</td>
+                        <td>g value</td>
+                        <td>speed</td>
+                        <td>Max Height</td>
+                        <td>Initial Speed</td>
+                        <td>Time(in sec)</td>
+                    </tr>
+                </table>
+            </td>
         </tr>
         <tr>
             <td><input type="range" value="1" min="0.05" max="3" step="0.05" id="earthRadiusSlider"></td>
@@ -117,6 +152,7 @@
         let pointsToFireXYZWithGravity = [];
         let pointsToFireXYZWithGravityVaryingWithHeight = [];
         const RADIUS_OF_EARTH = 6371000;//in metres
+        const INIT_VEL_MUL_FACTOR = 1000;
         function fireX() {
             if ($("#latitude").value == "" || $("#longitude").value == "") {
                 alert("Please enter latitude and longitude values");
@@ -166,7 +202,21 @@
             } else {
                 let point = addPoint(parseFloat($("#latitude").value), parseFloat($("#longitude").value), 0.02, { color: 0xfaee0f });
                 let t0 = new Date();
-                pointsToFireXYZWithGravityVaryingWithHeight.push([point, [point.position.x, point.position.y, point.position.z], t0.getTime()]);
+                let tr = document.createElement("tr");
+                let td0 = document.createElement("td");
+                let td1 = document.createElement("td");
+                let td2 = document.createElement("td");
+                let td3 = document.createElement("td");
+                let td4 = document.createElement("td");
+                let td5 = document.createElement("td");
+                tr.appendChild(td0);
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+                tr.appendChild(td4);
+                tr.appendChild(td5);
+                $("#ballMetrics").appendChild(tr);
+                pointsToFireXYZWithGravityVaryingWithHeight.push([point, [point.position.x, point.position.y, point.position.z], t0.getTime(),{"lastTime":t0.getTime(),"initialVelocity":null,"driftTime":null,"maxHeight":null},[td0,td1,td2,td3,td4,td5]]);
             }
         }
 
@@ -530,14 +580,15 @@
         displayGScale();
         $("#gscale").addEventListener("change", displayGScale);
 
-        function displayXDrift() {
+        /*function displayXDrift() {
             $("#xDriftTxt").innerText = "x Drift: " + $("#xDrift").value;
         }
         displayXDrift();
-        $("#xDrift").addEventListener("change", displayXDrift);
+        $("#xDrift").addEventListener("change", displayXDrift);*/
 
         function displayInitialVelocityValue() {
             $("#initialVelocityTxt").innerText = "Initial Velocity: " + $("#initialVelocity").value;
+            $("#initialVelocityMPerS").innerText = "Initial Velocity: " + (parseFloat($("#initialVelocity").value)*INIT_VEL_MUL_FACTOR).toFixed(2)+" m/s";
         }
         displayInitialVelocityValue();
         $("#initialVelocity").addEventListener("change", displayInitialVelocityValue);
@@ -583,7 +634,7 @@
         function getGValueAtHeight(s0, s0_plus_h) {
             let g = 9.8;
             let gValAtH = g * s0 * s0 / (s0_plus_h * s0_plus_h);//where h is R+H where H is height above earth surface
-            console.log("gValAtH " + s0_plus_h + "=" + gValAtH);
+            //console.log("gValAtH " + s0_plus_h + "=" + gValAtH);
             return gValAtH;
         }
 
@@ -675,26 +726,50 @@
                 let sx0 = pointObj[1][0] / radius;//unit vector x along line connecting (0,0,0) and the point
                 let sy0 = pointObj[1][1] / radius;//unit vector y along line connecting (0,0,0) and the point
                 let sz0 = pointObj[1][2] / radius;//unit vector z along line connecting (0,0,0) and the point
-                let tt0 = pointObj[2];
+                let tt0 = pointObj[3]["lastTime"];
+                pointObj[3]["lastTime"] = time;
                 let gScale = parseInt($("#gscale").value);
                 let x_2 = pointObj[0].position.x * pointObj[0].position.x;
                 let y_2 = pointObj[0].position.y * pointObj[0].position.y;
                 let z_2 = pointObj[0].position.z * pointObj[0].position.z;
                 let radialDistance = Math.sqrt(x_2 + y_2 + z_2);
                 let gScaled = getGValueAtHeight(RADIUS_OF_EARTH, (radialDistance*RADIUS_OF_EARTH)/radius) * gScale;
+                let gx0 = sx0 * gScaled;
+                let gy0 = sy0 * gScaled;
+                let gz0 = sz0 * gScaled;
+
+                let tDiff = time.getTime() - tt0;
+                tDiff = tDiff/1000;//time in seconds
+                const TIME_ZOOM_VALUE = 5;
+                tDiff*=TIME_ZOOM_VALUE;//zoom the time
                 //console.log(radialDistance, radius - 0.000001);
                 //if (radialDistance >= radius - 0.000001) {
-                    let ux0 = sx0 * 7000;// parseFloat($("#initialVelocity").value);
-                    let uy0 = sy0 * 7000;// parseFloat($("#initialVelocity").value);
-                    let uz0 = sz0 * 7000;// parseFloat($("#initialVelocity").value);
+                    let initVelObj = pointObj[3]["initialVelocity"];
+                    if(initVelObj==null) {
+                        let initVel = parseFloat($("#initialVelocity").value)*INIT_VEL_MUL_FACTOR;
+                        initVelObj = {
+                            "x":sx0 * initVel,
+                            "y":sy0 * initVel,
+                            "z":sz0 * initVel
+                        };
+                        pointObj[3]["initialVelocity"] = initVelObj;
+                    } else {
+                        initVelObj = {
+                            "x":initVelObj.x - gx0*tDiff,
+                            "y":initVelObj.y - gy0*tDiff,
+                            "z":initVelObj.z - gz0*tDiff
+                        };
+                        pointObj[3]["initialVelocity"] = initVelObj;
+                    }
+                    let initVelMag = Math.sqrt(initVelObj.x*initVelObj.x+initVelObj.y*initVelObj.y+initVelObj.z*initVelObj.z);
+                    
+                    let ux0 = initVelObj.x;// parseFloat($("#initialVelocity").value);
+                    let uy0 = initVelObj.y;// parseFloat($("#initialVelocity").value);
+                    let uz0 = initVelObj.z;// parseFloat($("#initialVelocity").value);
                     //console.log("u vector",ux0+"i+"+uy0+"j+"+uz0+"z");
-                    let gx0 = sx0 * gScaled;
-                    let gy0 = sy0 * gScaled;
-                    let gz0 = sz0 * gScaled;
+                    
                     //console.log("g vector",gx0+"i+"+gy0+"j+"+gz0+"z");
-                    let tDiff = time.getTime() - tt0;
-                    tDiff = tDiff/1000;//time in seconds
-                    tDiff*=100;//zoom the time
+                    
                     let displacementX0 = ux0 * tDiff - (0.5 * gx0 * tDiff * tDiff);// + (radialDistance > 3 ? parseFloat($("#xDrift").value) * tDiff : 0.0);
                     let displacementY0 = uy0 * tDiff - (0.5 * gy0 * tDiff * tDiff);
                     let displacementZ0 = uz0 * tDiff - (0.5 * gz0 * tDiff * tDiff);
@@ -708,10 +783,56 @@
                     let newPosY = pointObj[1][1] + displacementY0;
                     let newPosZ = pointObj[1][2] + displacementZ0;
 
+                    pointObj[1][0] = newPosX;//set this as new initial X, since we are doing integration
+                    pointObj[1][1] = newPosY;//set this as new initial Y, since we are doing integration
+                    pointObj[1][2] = newPosZ;//set this as new initial Z, since we are doing integration
+
                     let displacementMagnitude = Math.sqrt(newPosX * newPosX + newPosY * newPosY + newPosZ * newPosZ);
+                    let h = ((displacementMagnitude-radius)*(RADIUS_OF_EARTH/radius));
+                    pointObj[4][1].innerHTML= gScaled.toFixed(2)+" m/s^2";
+                    pointObj[4][2].innerHTML= "<font color='lightgreen'>u="+initVelMag.toFixed(2)+" m/s</font>";
+                    if(pointObj[4][4].innerHTML=="") {
+                        pointObj[4][4].innerHTML = initVelMag.toFixed(2)+" m/s";
+                    }
+                    if(pointObj[4][5].innerHTML=="") {
+                        pointObj[4][5].innerHTML = tDiff.toFixed(2);
+                    } else {
+                        pointObj[4][5].innerHTML = (parseFloat(pointObj[4][5].innerHTML)+tDiff).toFixed(2);
+                    }
+                    if(pointObj[3]["maxHeight"]==null) {
+                        pointObj[3]["maxHeight"] = h;
+                        pointObj[4][3].setAttribute("class","up");
+                    } else if(h>pointObj[3]["maxHeight"]){
+                        pointObj[3]["maxHeight"] = h;
+                        pointObj[4][3].setAttribute("class","up");
+                    } else {
+                        pointObj[4][3].setAttribute("class","down");
+                    }
+                    pointObj[4][3].innerHTML= pointObj[3]["maxHeight"].toFixed(2)+" m";
+                    if(h>0) {
+                        pointObj[4][0].innerHTML= "<font color='lightgreen'>"+ h.toFixed(2)+ " m</font>";
+                    } else {
+                        pointObj[4][0].innerHTML= "<font color='red'>"+ h.toFixed(2)+ " m</font>";
+                    }
 
                     if (displacementMagnitude > radius) {
+                        let heightAboveSurface = (displacementMagnitude-radius);
                         pointObj[0].position.x = newPosX;
+                        //fire x drift at 10% height of radius reached by the ball
+                        /*if(pointObj[3]["driftTime"]!=null) {//drift time has been added
+                            let tDiffDrift = time.getTime() - pointObj[3]["driftTime"].getTime();
+                            tDiffDrift = tDiffDrift/1000;//in seconds
+                            console.log("time before zoom",tDiffDrift);
+                            tDiffDrift*=TIME_ZOOM_VALUE;
+                            let driftAmount = parseFloat($("#xDrift").value) * tDiffDrift;
+                            driftAmount*=(radius/RADIUS_OF_EARTH);//scale down
+                            pointObj[0].position.x+=driftAmount;
+                            console.log("drifted on x axis by amount "+driftAmount+" at time "+tDiffDrift);
+                        }
+                        if((heightAboveSurface/radius)>0.1) {
+                            console.log("reached the drift height");
+                            pointObj[3]["driftTime"]=(new Date());//drift start time
+                        }*/
                         pointObj[0].position.y = newPosY;
                         pointObj[0].position.z = newPosZ;
                         //console.log("s0="+s0+"; "+u+"*"+tDiff+"-0.5*"+gScaled+"*"+(tDiff*tDiff)+"="+displacement+";//New z -->"+pointObj[0].position.z);
@@ -720,6 +841,7 @@
                         console.log(pointObj[0],"Point removed from pointsToFireXYZWithGravityVaryingWithHeight");
                         earth.remove(pointObj[0]);
                     }
+                    pointObj[2] = time;//set this as new time, since we are doing integration
                 //}
             });
             $("#time").innerText = ((time.getTime() - t0.getTime()) / 1000.0) + " sec";
