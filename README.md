@@ -9,3 +9,7 @@ Added a toolbox to drop a ball from any lattitude and longiude and there's butto
 Usage of the guide is explained in this video --> https://www.linkedin.com/posts/devashish-priyadarshi-96554112b_added-a-checkbox-to-stop-earths-rotation-activity-7159263016826396672-HSZZ?utm_source=share&utm_medium=member_desktop
 
 Added vector version of the s=ut+(0.5)*a*(t-squared) , here's the video showing the changes --> https://www.linkedin.com/posts/devashish-priyadarshi-96554112b_implemented-the-vector-version-of-the-equation-activity-7159400290155200513-fxYG?utm_source=share&utm_medium=member_desktop
+
+Added hand gesture detection mode by using mediapipe js libraries, the intial changes can be see by runing --> git diff 7ad7fb1581fb0e2e86638c6365d7993284bd9ccd a241c5107d64f7b35bb023e2eeec8a071e004985
+
+![image](https://github.com/devashish234073/globe-html-navigation/assets/20777854/79d48bb7-e7cd-475d-9eef-a056991df009)
