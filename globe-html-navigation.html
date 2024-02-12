@@ -929,6 +929,18 @@
       let results = undefined;
       console.log(video);
       let initNotDone = true;
+      const fingerIndexes = [[0, 1, 2, 3, 4],[0, 5, 6, 7, 8],[0, 9, 10, 11, 12],[0, 13, 14, 15, 16],[0, 17, 18, 19, 20]];//0th index is thumb
+      function checkIfFingerIsUp(fingerIndex,landmarks) {
+        let fingerIndxs = fingerIndexes[fingerIndex];
+        for(let indx=1;indx<fingerIndxs.length;indx++) {
+            let i1 = fingerIndxs[indx];
+            let i0 = fingerIndxs[indx-1];
+            if(landmarks[i1].y>landmarks[i0].y) {
+                return false;
+            }
+        }
+        return true;
+      }
       async function predictWebcam() {
         if(initNotDone) {
             initNotDone = false;
@@ -950,11 +962,16 @@
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         if (results.landmarks) {
           for (const landmarks of results.landmarks) {
+            if(checkIfFingerIsUp(0,landmarks)) {
+                $("#earthRotationEnabled").checked = false;
+            } else {
+                $("#earthRotationEnabled").checked = true;
+            }
             drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-              color: "#00FFAA",
-              lineWidth: 3
+              color: "#00FFFF",
+              lineWidth: 4
             });
-            drawLandmarks(canvasCtx, landmarks, { color: "#FAAA00", lineWidth: 2 });
+            drawLandmarks(canvasCtx, landmarks, { color: "#FF0000", lineWidth: 2 });
           }
         }
         canvasCtx.restore();
