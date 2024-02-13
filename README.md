@@ -3,7 +3,7 @@
 Added hand gesture detection using mediapipe library and added a logic when all points of a finger's y coordinates are sorted in accending or descending order to determine finger being up or down.
 Thumbs up is starting earth's rotation, thumbs down is stopping it. Index finger up is firing balls.
 
-![image](https://github.com/devashish234073/globe-html-navigation/assets/20777854/7d7bcc35-534e-4ee1-9b66-1e2af80815ef)
+![image](https://github.com/devashish234073/globe-html-navigation/assets/20777854/7d7bcc30-534e-4ee1-9b66-1e2af80815ef)
 
 Video showing the gesture changes --> https://www.linkedin.com/posts/devashish-priyadarshi-96554112b_added-a-meaning-to-the-hand-gesture-implementation-activity-7162879127434223616-CyFv?utm_source=share&utm_medium=member_desktop
 
