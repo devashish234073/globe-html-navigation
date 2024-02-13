@@ -5,9 +5,7 @@ Thumbs up is starting earth's rotation, thumbs down is stopping it. Index finger
 
 ![image](https://github.com/devashish234073/globe-html-navigation/assets/20777854/6474f59e-c349-4302-b5c3-ee873e9461b1)
 
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7162879037399392256" height="821" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
-
-initial details --> https://www.linkedin.com/posts/devashish-priyadarshi-96554112b_got-a-js-function-from-chatgpt-conversation-activity-7156657308922441728-aNMO?utm_source=share&utm_medium=member_desktop
+Video showing the gesture changes --> https://www.linkedin.com/posts/devashish-priyadarshi-96554112b_added-a-meaning-to-the-hand-gesture-implementation-activity-7162879127434223616-CyFv?utm_source=share&utm_medium=member_desktop
 
 Added a toolbox to drop a ball from any lattitude and longiude and there's button for throwing with or without gravity:
 
